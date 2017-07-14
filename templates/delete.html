@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+<div class="error">{{error}}</div>
+{% block content %}
+	<div>
+		Are you sure you want to delete <span style="font-weight: bold">{{subject}}</span>?
+	</div>
+	<br>
+	<form method="post">
+		<input type="submit" name="submit" value="Delete">
+		<input type="submit" name="submit" value="Cancel">
+	</form>
+{% endblock %}

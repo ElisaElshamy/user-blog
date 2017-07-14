@@ -4,6 +4,10 @@
       {{p.subject}}
     </div>
 
+    <div class="post-author">
+      <span>By: {{p.author}}</span>
+    </div>
+
     <div class="post-date">
       {{p.created.strftime("%b %d, %Y")}}
     </div>
@@ -12,4 +16,8 @@
   <div class="post-content">
     {{p._render_text | safe}}
   </div>
+
+  <a href="">Likes: </a> {{p.likes}}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="">Dislikes: </a> {{p.unlikes}}
 </div>

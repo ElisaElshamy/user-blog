@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <title>Unit 2 Signup</title>
-  </head>
+{% block content %}
 
-  <body>
-    <h2>Welcome, {{username}}!</h2>
-  </body>
-</html>
+ <h2>Welcome, {{username}}!</h2>
+
+ <a href="/blog">Go to the Blog</a>
+ <a href="/blog/newpost">Add new entry</a>
+ <a href="/blog/posts">View & Edit Entries</a>
+
+{% endblock %}

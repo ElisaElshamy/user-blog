@@ -5,6 +5,31 @@
   {% for p in posts %}
     {{ p.render() | safe }}
     <br><br>
+    {% set liked = [0] %}
+    
+    {% for l in likes if l.post.key().id() == p.key().id() %}
+    	
+    	{% if l.username|string == username|string %}
+    		{% set __ = liked.append(1) %}
+    	{% endif %}
+
+    	{% if loop.last %}
+    		 <form method="post">
+    		{% if liked | length > 1 %}
+
+    			<a href="/blog/unlike/{{p.key().id()}}">Unlike</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
+    		{% else %}
+    			<a href="/blog/like/{{p.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
+    		{% endif %}
+    		</form>
+    	{% endif %}
+    {% else %}
+    	<form method="post">
+    		<a href="/blog/like/{{p.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;</span>
+    	</form>
+ 
+    {% endfor %}
+	
   {% endfor %}
 
 {% endblock %}

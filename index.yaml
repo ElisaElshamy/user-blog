@@ -21,3 +21,9 @@ indexes:
   properties:
   - name: date
     direction: desc
+
+- kind: Post
+  ancestor: yes
+  properties:
+  - name: subject
+    direction: desc

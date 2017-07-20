@@ -126,8 +126,7 @@ class Post(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)  
     author = db.StringProperty(required = True)
-    liked = db.IntegerProperty(default = 0)
-    unliked = db.IntegerProperty(default = 0)
+    #likes = db.IntegerProperty(default = 0)
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
@@ -136,7 +135,20 @@ class Post(db.Model):
 class BlogFront(BlogHandler):
     def get(self):
         posts = Post.all().order('-created')
-        self.render('front.html', posts = posts)
+        if not self.user:
+            username = ''
+        else:
+            username = self.user.name
+
+        #user_liked = Likedby.all().filter('username =', username)
+        user_liked = Likedby.all()
+
+
+        self.render('front.html', posts = posts, username = username, likes = user_liked)
+
+    def post(self):
+        self.request.get('submit')
+
 
 class PostPage(BlogHandler):
     def get(self, post_id):
@@ -166,8 +178,8 @@ class NewPost(BlogHandler):
 
         if subject and content:
             p = Post(parent = blog_key(), subject = subject, content = content, author = author)
-            #p = Post(parent = blog_key(), subject = subject, content = content)
             p.put()
+
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
@@ -238,20 +250,53 @@ class Delete(BlogHandler):
                 error_msg = 'You do not have permission to delete post ' + post.subject
                 self.render('login-form.html', error = error_msg)
 
+class Likedby(db.Model):
+    post = db.ReferenceProperty(Post, collection_name='liked_by')
+    username = db.StringProperty(required = True)
 
-###### Unit 2 HW's
-class Rot13(BlogHandler):
-    def get(self):
-        self.render('rot13-form.html')
+class Like(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        posts = Post.all().order('-created')
 
-    def post(self):
-        rot13 = ''
-        text = self.request.get('text')
-        if text:
-            rot13 = text.encode('rot13')
+        if not self.user:
+            username = ''
+        else:
+            username = self.user.name
 
-        self.render('rot13-form.html', text = rot13)
+        if self.user and self.user.name == post.author:
+            error_msg = 'Nice try! But you cannot like your own posts!'
 
+            user_liked = Likedby.all()
+            self.render('front.html', posts = posts, username = username, likes = user_liked, error = error_msg)
+
+        elif self.user and self.user.name != post.author:
+            Likedby(post = post, username = str(self.user.name)).put()
+            user_liked = Likedby.all()
+            self.render('front.html', posts = posts, username = username, likes = user_liked)
+
+        else:
+            error_msg = 'You must be logged in to Like posts.'
+            self.render('front.html', posts = posts, error = error_msg)
+
+class Unlike(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        posts = Post.all().order('-created')
+
+        if not self.user:
+            username = ''
+            error_msg = 'You do not have access to that action.  Please login.'
+            self.render('front.html', posts = posts, username = username, error = error_msg)
+        else:
+            username = self.user.name
+            post.liked_by.filter('username =', str(self.user.name)).get().delete()
+            user_liked = Likedby.all()
+            self.render('front.html', posts = posts, username = username, likes = user_liked)
+            
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -302,9 +347,6 @@ class Signup(BlogHandler):
     def done(self, *a, **kw):
         raise NotImplementedError
 
-class Unit2Signup(Signup):
-    def done(self):
-        self.redirect('/unit2/welcome?username=' + self.username)
 
 class Register(Signup):
     def done(self):
@@ -348,17 +390,8 @@ class Welcome(BlogHandler):
         else:
             self.redirect('/signup')
 
-# class Welcome(BlogHandler):
-#     def get(self):
-#         username = self.request.get('username')
-#         if valid_username(username):
-#             self.render('welcome.html', username = username)
-#         else:
-#             self.redirect('/unit2/signup')
 
 app = webapp2.WSGIApplication([('/', MainPage),
-                               ('/unit2/rot13', Rot13),
-                               ('/unit2/signup', Unit2Signup),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/newpost', NewPost),
@@ -369,5 +402,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/posts', UserPosts),
                                ('/blog/edit/([0-9]+)', Edit),
                                ('/blog/delete/([0-9]+)', Delete),
+                               ('/blog/like/([0-9]+)', Like),
+                               ('/blog/unlike/([0-9]+)', Unlike),
                                ],
                               debug=True)

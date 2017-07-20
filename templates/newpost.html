@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>new post</h2>
+  {% block pagetitle %}
+    <h2>New Post</h2>
+  {% endblock %}
+  
 
     <form method="post">
       <label>
@@ -16,6 +19,7 @@
 
       <div class="error">{{error}}</div>
 
-      <input type="submit">
+      <input type="submit" name="submit" value="Save Entry">
+      <input type="submit" name="submit" value="Cancel">
     </form>
 {% endblock %}

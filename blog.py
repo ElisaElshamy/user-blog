@@ -140,9 +140,7 @@ class BlogFront(BlogHandler):
         else:
             username = self.user.name
 
-        #user_liked = Likedby.all().filter('username =', username)
         user_liked = Likedby.all()
-
 
         self.render('front.html', posts = posts, username = username, likes = user_liked)
 
@@ -176,14 +174,17 @@ class NewPost(BlogHandler):
         subject = self.request.get('subject')
         content = self.request.get('content')
 
-        if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content, author = author)
-            p.put()
+        if self.request.get('submit') == "Save Entry":
+            if subject and content:
+                p = Post(parent = blog_key(), subject = subject, content = content, author = author)
+                p.put()
 
-            self.redirect('/blog/%s' % str(p.key().id()))
-        else:
-            error = "subject and content, please!"
-            self.render("newpost.html", subject=subject, content=content, error=error)
+                self.redirect('/blog/%s' % str(p.key().id()))
+            else:
+                error = "subject and content, please!"
+                self.render("newpost.html", subject=subject, content=content, error=error)
+
+        self.redirect('/blog')
 
 class UserPosts(BlogHandler):
     def get(self):
@@ -211,18 +212,19 @@ class Edit(BlogHandler):
             self.render('login-form.html', error = error)
 
     def post(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
-        if self.user and post.author == self.user.name:
-            post.subject = self.request.get('subject')  
-            post.content = self.request.get('content')
-            post.put()
-            posts = Post.all().order('-created')
-            self.render("front.html", posts = posts)
+        if self.request.get('submit') == "Save Entry":
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            if self.user and post.author == self.user.name:
+                post.subject = self.request.get('subject')  
+                post.content = self.request.get('content')
+                post.put()
 
-        else:
-            error = "You do not have permission to edit " + post.subject
-            self.render('login-form.html', error = error)
+            else:
+                error = "You do not have permission to edit " + post.subject
+                self.render('login-form.html', error = error)
+
+        self.redirect("/blog")
 
 class Delete(BlogHandler):
     def get(self, post_id):
@@ -244,11 +246,16 @@ class Delete(BlogHandler):
             post = db.get(key)
 
             if self.user and self.user.name == post.author:
+                
+                for like in post.liked_by:
+                    like.delete()
+
                 db.delete(post)
-                self.redirect("/blog")
             else:
                 error_msg = 'You do not have permission to delete post ' + post.subject
                 self.render('login-form.html', error = error_msg)
+
+        self.redirect("/blog")
 
 class Likedby(db.Model):
     post = db.ReferenceProperty(Post, collection_name='liked_by')
@@ -273,8 +280,7 @@ class Like(BlogHandler):
 
         elif self.user and self.user.name != post.author:
             Likedby(post = post, username = str(self.user.name)).put()
-            user_liked = Likedby.all()
-            self.render('front.html', posts = posts, username = username, likes = user_liked)
+            self.redirect("/blog")
 
         else:
             error_msg = 'You must be logged in to Like posts.'

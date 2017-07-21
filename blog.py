@@ -212,25 +212,27 @@ class NewPost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login?error=10')
 
-        author = self.user.name
-        subject = self.request.get('subject')
-        content = self.request.get('content')
+        else:
+            author = self.user.name
+            subject = self.request.get('subject')
+            content = self.request.get('content')
 
-        if self.request.get('submit') == "Save Entry":
-            if subject and content:
-                p = Post(parent = blog_key(), subject = subject, content = content, author = author)
-                p.put()
+            if self.request.get('submit') == "Save Entry":
+                if subject and content:
+                    p = Post(parent = blog_key(), subject = subject, content = content, author = author)
+                    p.put()
 
-                self.redirect('/blog/%s' % str(p.key().id()))
+                    self.redirect('/blog/%s' % str(p.key().id()))
+
+                else:
+                    error_msg = error_message(4)
+                    self.render("newpost.html", subject=subject, content=content, error=error_msg)
 
             else:
-                error_msg = error_message(4)
-                self.render("newpost.html", subject=subject, content=content, error=error_msg)
-
-        #If save was successful or cancelled
-        self.redirect('/blog')
+                #If cancelled
+                self.redirect('/blog')
 
 ##### SHOW ONLY USER'S POSTS #####
 class UserPosts(BlogHandler):
@@ -277,9 +279,9 @@ class Edit(BlogHandler):
                     self.redirect("/blog?error=6")
             else:
                 self.redirect("/login?error=5")
-
-        #If save was successful or cancelled
-        self.redirect("/blog")
+        else:
+            #If cancelled
+            self.redirect("/blog")
 
 ##### DELETE OWN POST #####
 class Delete(BlogHandler):
@@ -305,20 +307,28 @@ class Delete(BlogHandler):
 
             if self.user:
                 if self.user.name == post.author:
-                
+                    #We MUST delete every associated with that post
+                    for comment in post.comments:
+
+                        for commentlike in comment.comment_liked:
+                            commentlike.delete()
+
+                        comment.delete()
+
                     for like in post.liked_by:
                         like.delete()
 
                     db.delete(post)
-
+                    self.redirect("/blog")
                 else:
                     self.redirect("/blog?error=6")
 
             else:
                 self.redirect("/login?error=7")
 
-        #If delete was successful or cancelled
-        self.redirect("/blog")
+        else:
+            #If cancelled
+            self.redirect("/blog")
 
 ##### LIKE POST DATA MODEL #####
 class Likedby(db.Model):
@@ -380,7 +390,7 @@ class CommentPage(BlogHandler):
             self.error(404)
             return
 
-        self.render("permalink.html", comment = comment)
+        self.render("commentpermalink.html", comment = comment)
 
 ##### SHOW ONLY USER'S COMMENTS #####
 class UserComments(BlogHandler):
@@ -404,25 +414,26 @@ class AddComment(BlogHandler):
     def post(self, post_id):
         if not self.user:
             self.redirect("/login?error=10")
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
 
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
+            author = self.user.name
+            subject = self.request.get('subject')
+            content = self.request.get('content')
 
-        author = self.user.name
-        subject = self.request.get('subject')
-        content = self.request.get('content')
+            if self.request.get('submit') == "Save Entry":
+                if subject and content:
 
-        if self.request.get('submit') == "Save Entry":
-            if subject and content:
-
-                Comment(post = post, author = author, subject = subject, content = content).put()
-
-            else:
-                error_msg = error_message(4)
-                self.render("addcomment.html", subject=subject, content=content, error=error_msg)
-
-        #If save was successful or cancelled
-        self.redirect('/blog')
+                    Comment(post = post, author = author, subject = subject, content = content).put()
+                    self.redirect('/blog')
+                    
+                else:
+                    error_msg = error_message(4)
+                    self.render("addcomment.html", subject=subject, content=content, error=error_msg)
+            else: 
+                #If cancelled
+                self.redirect('/blog')
 
 ##### EDIT OWN COMMENT #####
 class EditComment(BlogHandler):
@@ -454,14 +465,15 @@ class EditComment(BlogHandler):
                     comment.subject = self.request.get('subject')  
                     comment.content = self.request.get('content')
                     comment.put()
+                    self.redirect("/blog")
 
                 else:
                     self.redirect("/blog?error=6")   
             else:
                 self.redirect("/login?error=5") 
-
-        #If save was successful or cancelled
-        self.redirect("/blog")
+        else:
+            #If cancelled
+            self.redirect("/blog")
 
 ##### DELETE OWN COMMENT #####
 class DeleteComment(BlogHandler):
@@ -487,16 +499,20 @@ class DeleteComment(BlogHandler):
 
             if self.user:
                 if self.user.name == comment.author:
-                    db.delete(comment)
+                    #We MUST delete everything associated with that comment
+                    for commentlike in comment.comment_liked:
+                        commentlike.delete()
 
+                    db.delete(comment)
+                    self.redirect("/blog")
                 else:
                     self.redirect("/blog?error=6")
 
             else:
                 self.redirect("/login?error=5")
-
-        #If delete was successful or cancelled
-        self.redirect("/blog")
+        else:
+            #If delete was successful or cancelled
+            self.redirect("/blog")
 
 ##### LIKED COMMENT DATA MODEL #####
 class CommentLiked(db.Model):
@@ -528,7 +544,7 @@ class UnlikeComment(BlogHandler):
 
         if not self.user:
             self.redirect("/login?error=10")
-            
+
         else:
             username = self.user.name
             comment.comment_liked.filter('username =', str(self.user.name)).get().delete()

@@ -28,9 +28,45 @@
     		<a href="/blog/like/{{p.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;</span>
  
     {% endfor %}
-    	<a href="/blog/addcomment">Add a comment</a>
+    	<a href="/blog/addcomment/{{p.key().id()}}">Add a comment</a>
     </form>
-	
+
+    <!--COMMENTS-->
+    <div id="comments-section">
+    {% for c in comments if c.post.key().id() == p.key().id() %}
+        
+        {{ c.render() | safe }}
+        <br><br>
+
+
+        {% set comments_liked = [0] %}
+    
+        {% for cl in commentlikes if cl.comment.key().id() == c.key().id() %}
+        
+            {% if cl.username|string == username|string %}
+                {% set __ = comments_liked.append(1) %}
+            {% endif %}
+
+            {% if loop.last %}
+
+                {% if comments_liked | length > 1 %}
+
+                    <a href="/blog/comment/unlike/{{c.key().id()}}">Unlike</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
+                {% else %}
+                    <a href="/blog/comment/like/{{c.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
+                {% endif %}
+
+            {% endif %}
+                
+            {% else %}
+                <a href="/blog/comment/like/{{c.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;</span>
+ 
+        {% endfor %}
+
+
+    {% endfor %}
+	</div>
+
   {% endfor %}
 
 {% endblock %}

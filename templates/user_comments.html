@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+ {% for c in comments %}
+ 
+    {{ c.render() | safe }}
+
+    <br>
+    <a href="./editcomment/{{c.key().id()}}">Edit</a>
+    <br>
+    <a href="./deletecomment/{{c.key().id()}}">Delete</a>
+    <br>
+    
+  {% endfor %}
+
+{% endblock %}

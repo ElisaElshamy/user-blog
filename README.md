@@ -32,4 +32,4 @@ Datastore and Python.  Page templates were built using Jinja 2.
 
 - **Python 2.7.12**
 - **Google App Engine** - https://cloud.google.com/appengine/
-- - **Jinja 2.9** - http://jinja.pocoo.org/docs/2.9/
+- **Jinja 2.9** - http://jinja.pocoo.org/docs/2.9/

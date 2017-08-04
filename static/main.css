@@ -1,4 +1,62 @@
-body {
+body,
+.container {
+    background-color: #ccc;
+}
+
+.post {
+    background-color: #FFF;
+    border-radius: 6px;
+}
+
+.comment {
+    border-left: 2px solid #563d7c;
+}
+
+.post-form {
+    margin-top: 10px;
+    margin-bottom: 28px;
+}
+
+.account-links a {
+    color: #FFF;
+}
+
+.like-link {
+    color: #563d7c;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.like-count {
+    font-size: 16px;
+    padding: 0 28px 0 8px;
+}
+
+.btn {
+    background-color: #563d7c !important;
+    color: #FFF !important;
+}
+
+.btn:hover {
+    background-color: #ccc !important;
+    color: #563d7c !important;
+}
+
+.post-title h2, h4 {
+    color: #563d7c;
+}
+
+.glyphicon-calendar {
+    color: #563d7c;
+    margin: 0 0 12px 20px;
+}
+
+.post-author,
+.post-date {
+    display: inline;
+}
+
+/*body {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 14px;
 
@@ -85,3 +143,4 @@ input[type=submit] {
     margin: 15px 0 0 40px;
 }
 
+*/

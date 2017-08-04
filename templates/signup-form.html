@@ -1,70 +1,37 @@
-<!DOCTYPE html>
-
-<html>
-  <head>
-    <title>Unit 2 Rot 13</title>
-    <style type="text/css">
-      .label {text-align: right}
-      .error {color: red}
-    </style>
-
-  </head>
-
-  <body>
-    <h2>Signup</h2>
-    <form method="post">
-      <table>
-        <tr>
-          <td class="label">
-            Username
-          </td>
-          <td>
-            <input type="text" name="username" value="{{username}}">
-          </td>
-          <td class="error">
-            {{error_username}}
-          </td>
-        </tr>
-
-        <tr>
-          <td class="label">
-            Password
-          </td>
-          <td>
-            <input type="password" name="password" value="">
-          </td>
-          <td class="error">
-            {{error_password}}
-          </td>
-        </tr>
-
-        <tr>
-          <td class="label">
-            Verify Password
-          </td>
-          <td>
-            <input type="password" name="verify" value="">
-          </td>
-          <td class="error">
-            {{error_verify}}
-          </td>
-        </tr>
-
-        <tr>
-          <td class="label">
-            Email (optional)
-          </td>
-          <td>
-            <input type="text" name="email" value="{{email}}">
-          </td>
-          <td class="error">
+{% extends "base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-11 col-md-offset-1">
+        <h2>Signup</h2>
+    </div>
+  </div>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-1">
+        {% if error_username or error_password or error_verify or error_email %}
+          <div class="alert alert-danger" role="alert">
+            {{error_username}} <br>
+            {{error_password}} <br>
+            {{error_verify}} <br>
             {{error_email}}
-          </td>
-        </tr>
-      </table>
+          </div>
+        {% endif %}
+        <form method="post">
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type ="text" maxlength="250" class="form-control" name="username" value="{{username}}">
 
-      <input type="submit">
-    </form>
-  </body>
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" name="password" value="">
 
-</html>
+            <label for="verify">Verify Password:</label>
+            <input type="password" class="form-control" name="verify" value="">
+
+            <label for="verify">Email (optional):</label>
+            <input type="text" class="form-control" name="email" value="{{email}}">
+            <input class="btn btn-default" type="submit">      
+          </div>
+        </form>
+      </div>
+  </div>
+{% endblock %}
+

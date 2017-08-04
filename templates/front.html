@@ -1,72 +1,65 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="error">{{error}}</div>
+    <div class="row">
+        <div class="col-md-6">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{error}}
+                </div>
+            {% endif %}
+        </div>
+    </div>
   {% for p in posts %}
     {{ p.render() | safe }}
-    <br><br>
-    <form method="post">
-    {% set liked = [0] %}
-    
-    {% for l in likes if l.post.key().id() == p.key().id() %}
-    	
-    	{% if l.username|string == username|string %}
-    		{% set __ = liked.append(1) %}
-    	{% endif %}
-
-    	{% if loop.last %}
-
-    		{% if liked | length > 1 %}
-
-    			<a href="/blog/unlike/{{p.key().id()}}">Unlike</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
-    		{% else %}
-    			<a href="/blog/like/{{p.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
-    		{% endif %}
-
-    	{% endif %}
-    {% else %}
-    		<a href="/blog/like/{{p.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;</span>
- 
-    {% endfor %}
-    	<a href="/blog/addcomment/{{p.key().id()}}">Add a comment</a>
-    </form>
-
+    <div class="row">
+        <div class="col-md-6 post-form">
+            <form method="post">
+                {% set liked = [0] %}
+                {% for l in likes if l.post.key().id() == p.key().id() %}
+                	{% if l.username|string == username|string %}
+                		{% set __ = liked.append(1) %}
+                	{% endif %}
+                	{% if loop.last %}
+                		{% if liked | length > 1 %}
+                			<a class="like-link" href="/blog/unlike/{{p.key().id()}}">Unlike</a><span class="like-count">{{ loop.length }}</span>
+                		{% else %}
+                			<a class="like-link" href="/blog/like/{{p.key().id()}}">Like</a><span class="like-count">{{ loop.length }}</span>
+                		{% endif %}
+                	{% endif %}
+                {% else %}
+                	<a class="like-link" href="/blog/like/{{p.key().id()}}">Like</a><span class="like-count">0</span>  
+                {% endfor %}
+            	<a class="btn btn-default" href="/blog/addcomment/{{p.key().id()}}">Add a comment</a>
+            </form>
+        </div>
+    </div>
     <!--COMMENTS-->
     <div id="comments-section">
-    {% for c in comments if c.post.key().id() == p.key().id() %}
-        
-        {{ c.render() | safe }}
-        <br><br>
-
-
-        {% set comments_liked = [0] %}
-    
-        {% for cl in commentlikes if cl.comment.key().id() == c.key().id() %}
-        
-            {% if cl.username|string == username|string %}
-                {% set __ = comments_liked.append(1) %}
-            {% endif %}
-
-            {% if loop.last %}
-
-                {% if comments_liked | length > 1 %}
-
-                    <a href="/blog/comment/unlike/{{c.key().id()}}">Unlike</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
-                {% else %}
-                    <a href="/blog/comment/like/{{c.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;{{ loop.length }}&nbsp;&nbsp;&nbsp;</span>
-                {% endif %}
-
-            {% endif %}
-                
-            {% else %}
-                <a href="/blog/comment/like/{{c.key().id()}}">Like</a><span>&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;</span>
- 
+        {% for c in comments if c.post.key().id() == p.key().id() %}      
+            {{ c.render() | safe }}
+            <div class="row">
+                <div class="col-xs-1"></div>
+                <div class="col-md-6 post-form">
+                    {% set comments_liked = [0] %}
+                    {% for cl in commentlikes if cl.comment.key().id() == c.key().id() %}
+                        {% if cl.username|string == username|string %}
+                            {% set __ = comments_liked.append(1) %}
+                        {% endif %}
+                        {% if loop.last %}
+                            {% if comments_liked | length > 1 %}
+                                <a class="like-link" href="/blog/comment/unlike/{{c.key().id()}}">Unlike</a><span class="like-count">{{ loop.length }}</span>
+                            {% else %}
+                                <a class="like-link" href="/blog/comment/like/{{c.key().id()}}">Like</a><span class="like-count">{{ loop.length }}</span>
+                            {% endif %}
+                        {% endif %}
+          
+                    {% else %}
+                        <a class="like-link" href="/blog/comment/like/{{c.key().id()}}">Like</a><span class="like-count">0</span>
+                    {% endfor %}
+                </div>
+            </div>
         {% endfor %}
-
-
-    {% endfor %}
 	</div>
-
   {% endfor %}
-
 {% endblock %}

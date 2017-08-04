@@ -1,21 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <link type="text/css" rel="stylesheet" href="/static/main.css" />
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+			integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<link type="text/css" rel="stylesheet" href="/static/main.css" />
+		<title>Multi User Blog</title>
+	</head>
 
-  <title>CS 253 Blog</title>
-</head>
-
-<body>
-  <a href="/blog" class="main-title">
-    CS 253 Blog
-  </a>
-
-  <div id="content">
-  {% block content %}
-  {% endblock %}
-  </div>
-</body>
+	<body>
+		<nav class="navbar navbar-inverse bg-inverse">
+			<div class="col-xs-9">
+				<a class="navbar-brand" href="/blog">
+					<span class="glyphicon glyphicon-home" aria-hidden="true"></span> Multi User Blog
+				</a>
+			</div>
+			<div class="col-xs-3">
+				{% if username and username != '' %}
+					<span class="navbar-text account-links">
+						Logged in as {{username}}
+						<a class="" href="/logout">
+							<span class="glyphicon" aria-hidden="true"></span> log out
+						</a>
+					</span>
+				{% else %}
+					<span class="navbar-text account-links">
+						<a class="" href="/login">
+							<span class="glyphicon" aria-hidden="true"></span> Log in
+						</a>
+						or
+						<a class="" href="/signup">
+							<span class="glyphicon" aria-hidden="true"></span> Sign up
+						</a>
+					</span>
+				{% endif %}
+								
+			</div>
+		</nav>
+		<div class="container">
+			<div id="content">
+				{% block content %}
+				{% endblock %}
+			</div>
+		</div>
+	</body>
 
 </html>
 

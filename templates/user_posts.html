@@ -1,16 +1,12 @@
 {% extends "base.html" %}
-
 {% block content %}
-
- {% for p in posts %}
- 
-    {{ p.render() | safe }}
-    <br>
-    <a href="./edit/{{p.key().id()}}">Edit</a>
-    <br>
-    <a href="./delete/{{p.key().id()}}">Delete</a>
-    <br>
-    
-  {% endfor %}
-
+    {% for p in posts %}
+        {{ p.render() | safe }}
+        <div class="row">
+            <div class="col-md-8 post-form">
+                <a class="btn btn-default" href="./edit/{{p.key().id()}}">Edit</a>
+                <a class="btn btn-default" href="./delete/{{p.key().id()}}">Delete</a>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

@@ -1,19 +1,23 @@
-<div class="post">
-  <div class="post-heading">
-    <div class="post-title">
-      {{p.subject}}
+<div class="row">
+  <div class="col-md-8 post">
+    <div class="post-heading">
+      <div class="post-title">
+        <h2>{{p.subject}}</h2>
+      </div>
+
+      <div class="post-author">
+        <span>By: {{p.author}}</span>
+      </div>
+
+      <div class="post-date">
+        <span class="glyphicon glyphicon-calendar"></span>
+        <span>{{p.created.strftime("%b %d, %Y")}}</span>
+      </div>
     </div>
 
-    <div class="post-author">
-      <span>By: {{p.author}}</span>
-    </div>
-
-    <div class="post-date">
-      {{p.created.strftime("%b %d, %Y")}}
+    <div class="post-content">
+      <p>{{p._render_text | safe}}</p>
     </div>
   </div>
-
-  <div class="post-content">
-    {{p._render_text | safe}}
-  </div>
+  <div class="col-md-4"></div>
 </div>

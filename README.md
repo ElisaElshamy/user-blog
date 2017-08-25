@@ -9,7 +9,16 @@ is built using Google App Engine and the Google Datastore.
 The blog is available online at:
 https://udacity-user-blog-172201.appspot.com/blog
 
-No installation is necessary at this time.
+If you'd rather run the blog locally, in the blog directory type
+the following command in the terminal:
+```
+dev_appserver.py app.yaml
+```
+
+Then go to your browser and visit http://localhost:8080/blog
+The blog will be empty, you must create a user and content.
+You can visit the local datastore at http://localhost:8000/datastore
+in your browser.
 
 # How to use
 
